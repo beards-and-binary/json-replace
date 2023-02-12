@@ -1,24 +1,29 @@
-const wait = require('./wait');
 const process = require('process');
 const cp = require('child_process');
 const path = require('path');
+const parseJson = require('./parse-json');
 
-test('throws invalid number', async () => {
-  await expect(wait('foo')).rejects.toThrow('milliseconds not a number');
+test('parseJson throws on invalid JSON', () => {
+  expect(() => parseJson('Invalid JSON')).toThrow('The passed JSON is invalid');
 });
 
-test('wait 500 ms', async () => {
-  const start = new Date();
-  await wait(500);
-  const end = new Date();
-  var delta = Math.abs(end - start);
-  expect(delta).toBeGreaterThanOrEqual(500);
+test('parseJson returns a copy of the Object', () => {
+  const testObject = { id: 1, name: "Person" };
+  const result = parseJson(JSON.stringify(testObject));
+  expect(result.id).toBe(1);
+  expect(result.name).toBe('Person');
 });
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = 100;
+test('process runs', () => {
+  const json = { id: 1 };
+  process.env['INPUT_JSON'] = JSON.stringify(json);
+  process.env['INPUT_PROPERTIES'] = 'id\nname';
+  process.env['INPUT_VALUES'] = '2\n"John Doe"';
+
   const ip = path.join(__dirname, 'index.js');
-  const result = cp.execSync(`node ${ip}`, {env: process.env}).toString();
-  console.log(result);
-})
+  const result = cp.execSync(`node ${ip}`, { env: process.env }).toString();
+  const resultJson = result.match(/::set-output name=json::(.*)/)[1];
+  const resultObject = JSON.parse(resultJson);
+  expect(resultObject.id).toBe(2);
+  expect(resultObject.name).toBe('John Doe');
+});

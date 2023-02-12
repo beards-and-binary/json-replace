@@ -1,13 +1,22 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'JSON Replace'
+description: 'Performs a replacement on the passed JSON Object'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  json:
+    description: 'The JSON to update'
     required: true
-    default: '1000'
+  properties:
+    description: 'A list of properties to update in the JSON, passed as a multiline string'
+    required: true
+  values:
+    description: 'A list of values to set for the passed properties, passed as a multiline string.'
+                 'Values can be passed as JSON strings, or as raw string values'
+    required: true
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  json:
+    description: 'The updated JSON'
 runs:
   using: 'node16'
   main: 'dist/index.js'
+branding:
+  icon: 'code'
+  color: 'green'

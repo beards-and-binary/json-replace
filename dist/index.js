@@ -2688,19 +2688,23 @@ exports.default = _default;
 
 /***/ }),
 
-/***/ 258:
+/***/ 304:
 /***/ ((module) => {
 
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
+/**
+ * Parses the passed JSON and returns the value
+ * @param {string} json
+ * @returns {Object}
+ */
+function parseJson(json) {
+  try {
+    return JSON.parse(json);
+  } catch (error) {
+    throw new Error('The passed JSON is invalid');
+  }
+}
 
-module.exports = wait;
+module.exports = parseJson;
 
 
 /***/ }),
@@ -2835,20 +2839,36 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
+const parseJson = __nccwpck_require__(304);
 
-
-// most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const json = core.getInput('json', { required: true });
+    const properties = core.getMultilineInput('properties', { required: true });
+    const values = core.getMultilineInput('values', { required: true });
+    core.debug(`passed json: ${json}`);
+    core.debug(`passed properties: ${properties}`);
+    core.debug(`passed values: ${values}`);
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const copy = parseJson(json);
+    if (properties.length !== values.length) {
+      throw new RangeError('The number of passed properties and values does not match');
+    }
 
-    core.setOutput('time', new Date().toTimeString());
+    core.info('All inputs are valid.  Performing updates...');
+    const joined = properties.map((p, i) => ({ key: p, value: values[i] }));
+    joined.forEach((kv) => {
+      try {
+        const parsedValue = JSON.parse(kv.value);
+        core.debug(`Setting property ${kv.key} as ${parsedValue}`);
+        copy[kv.key] = parsedValue;
+      } catch (error) {
+        // If the value can't be parsed, just assign it directly
+        core.debug(`Could not parse value, setting property ${kv.key} as ${kv.value}`);
+        copy[kv.key] = kv.value;
+      }
+    });
+    core.setOutput('json', copy);
   } catch (error) {
     core.setFailed(error.message);
   }
