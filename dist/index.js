@@ -2847,8 +2847,8 @@ async function run() {
     const properties = core.getMultilineInput('properties', { required: true });
     const values = core.getMultilineInput('values', { required: true });
     core.debug(`passed json: ${json}`);
-    core.debug(`passed properties: ${properties}`);
-    core.debug(`passed values: ${values}`);
+    core.debug(`passed properties: ${JSON.stringify(properties)}`);
+    core.debug(`passed values: ${JSON.stringify(values)}`);
 
     const copy = parseJson(json);
     if (properties.length !== values.length) {
