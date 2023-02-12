@@ -2868,6 +2868,7 @@ async function run() {
         copy[kv.key] = kv.value;
       }
     });
+    core.info('All updates completed successfully');
     core.setOutput('json', copy);
   } catch (error) {
     core.setFailed(error.message);
