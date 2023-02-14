@@ -9,7 +9,8 @@ This action updates the passed JSON using the passed properties and values.
 
 ### `updates`
 **Required** The list of Updates to process, provided as key / value pairs
-Example: `[['key1', 'value 1'], ['key2', {id: 1}]]
+
+Example: `[['key1', 'value 1'], ['key2', {id: 1}]]`
 
 ## Outputs
 ### `json`
