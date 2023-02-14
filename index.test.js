@@ -2,6 +2,7 @@ const process = require('process');
 const cp = require('child_process');
 const path = require('path');
 const parseJson = require('./parse-json');
+const parseUpdates = require('./parse-updates');
 
 test('parseJson throws on invalid JSON', () => {
   expect(() => parseJson('Invalid JSON')).toThrow('The passed JSON is invalid');
@@ -14,11 +15,16 @@ test('parseJson returns a copy of the Object', () => {
   expect(result.name).toBe('Person');
 });
 
+test('parseUpdates throws if non-strings are passed as keys', () => {
+  const json = JSON.stringify([['validKey', 1], [1, 2]]);
+  expect(() => parseUpdates(json)).toThrow('Keys must all be strings');
+});
+
 test('process runs', () => {
   const json = { id: 1 };
+  const updates = [['name', 'John Doe']];
   process.env['INPUT_JSON'] = JSON.stringify(json);
-  process.env['INPUT_PROPERTIES'] = 'id\nname';
-  process.env['INPUT_VALUES'] = '2\n"John Doe"';
+  process.env['INPUT_UPDATES'] = JSON.stringify(updates);
 
   const ip = path.join(__dirname, 'index.js');
   const result = cp.execSync(`node ${ip}`, { env: process.env }).toString();

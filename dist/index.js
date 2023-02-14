@@ -2709,6 +2709,30 @@ module.exports = parseJson;
 
 /***/ }),
 
+/***/ 743:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const parseJson = __nccwpck_require__(304);
+
+/**
+ * Parses the passed JSON Values List
+ * @param {string} json
+ */
+function parseUpdates(json) {
+  /** @type {[string, any][]} */
+  const values = parseJson(json);
+  const invalidKeys = values.filter((v) => !(typeof v[0] == 'string'));
+  if (invalidKeys.some(() => true)) {
+    throw new Error('Keys must all be strings');
+  }
+  return values;
+}
+
+module.exports = parseUpdates;
+
+
+/***/ }),
+
 /***/ 491:
 /***/ ((module) => {
 
@@ -2840,32 +2864,29 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(186);
 const parseJson = __nccwpck_require__(304);
+const parseUpdates = __nccwpck_require__(743);
 
 async function run() {
   try {
-    const json = core.getInput('json', { required: true });
-    const properties = core.getMultilineInput('properties', { required: true });
-    const values = core.getMultilineInput('values', { required: true });
-    core.debug(`passed json: ${json}`);
-    core.debug(`passed properties: ${JSON.stringify(properties)}`);
-    core.debug(`passed values: ${JSON.stringify(values)}`);
+    const targetJson = core.getInput('json', { required: true });
+    const updatesJson = core.getInput('updates', { required: true });
 
-    const copy = parseJson(json);
-    if (properties.length !== values.length) {
-      throw new RangeError('The number of passed properties and values does not match');
-    }
+    core.debug(`passed json: ${targetJson}`);
+    core.debug(`passed updates: ${updatesJson}`);
 
-    core.info('All inputs are valid.  Performing updates...');
-    const joined = properties.map((p, i) => ({ key: p, value: values[i] }));
-    joined.forEach((kv) => {
+    const copy = parseJson(targetJson);
+    const updates = parseUpdates(updatesJson);
+
+    core.info(`All inputs are valid.  Performing ${updates.length} update(s)...`);
+    updates.forEach(([key, value]) => {
       try {
-        const parsedValue = JSON.parse(kv.value);
-        core.debug(`Setting property ${kv.key} as ${parsedValue}`);
-        copy[kv.key] = parsedValue;
+        const parsedValue = JSON.parse(value);
+        core.debug(`Setting property ${key} as ${parsedValue}`);
+        copy[key] = parsedValue;
       } catch (error) {
         // If the value can't be parsed, just assign it directly
-        core.debug(`Could not parse value, setting property ${kv.key} as ${kv.value}`);
-        copy[kv.key] = kv.value;
+        core.debug(`Could not parse value, setting property ${key} as ${value}`);
+        copy[key] = value;
       }
     });
     core.info('All updates completed successfully');
