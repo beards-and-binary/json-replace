@@ -23,9 +23,4 @@ jobs:
     - uses: ./
       with:
         json: '{"id": 1, "name": "tim"}'
-        properties: |
-          id
-          name
-        values: |
-          2
-          John
+        updates: '[['name', 'Tim Tebow']]'
