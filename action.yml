@@ -4,13 +4,8 @@ inputs:
   json:
     description: 'The JSON to update'
     required: true
-  properties:
-    description: 'A list of properties to update in the JSON, passed as a multiline string'
-    required: true
-  values:
-    description: |
-      'A list of values to set for the passed properties, passed as a multiline string.'
-      'Values can be passed as JSON strings, or as raw string values'
+  updates:
+    description: 'A list of properties to update in the JSON, passed as key, value sub-lists'
     required: true
 outputs:
   json:

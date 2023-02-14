@@ -7,11 +7,9 @@ This action updates the passed JSON using the passed properties and values.
 ### `json`
 **Required** The JSON to update
 
-### `properties`
-**Required** The property paths to update
-
-### `values`
-**Required** The values to set for each property path
+### `updates`
+**Required** The list of Updates to process, provided as key / value pairs
+Example: `[['key1', 'value 1'], ['key2', {id: 1}]]
 
 ## Outputs
 ### `json`
