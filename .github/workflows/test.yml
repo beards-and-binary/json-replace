@@ -23,4 +23,4 @@ jobs:
     - uses: ./
       with:
         json: '{"id": 1, "name": "tim"}'
-        updates: '[['name', 'Tim Tebow']]'
+        updates: '[["name", "Tim Tebow"]]'
