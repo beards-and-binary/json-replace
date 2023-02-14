@@ -1,5 +1,5 @@
 name: 'JSON Replace'
-description: 'Performs a replacement on the passed JSON Object'
+description: 'Performs value replacements on the passed JSON Object'
 inputs:
   json:
     description: 'The JSON to update'
