@@ -35,3 +35,9 @@ The updated JSON
 #    "foo2": "bar2"
 #  }
 ```
+
+## Future Enhancements
+Some future enhancements that I would like to include are:
+- Add additional mode(s) for updating
+  - *merge* - merge the passed JSON with the target JSON instead of doing array-based updates
+- Add support for using JSONPath as the key value instead of just top-level property names
