@@ -19,7 +19,7 @@ async function run() {
         const parsedValue = JSON.parse(value);
         core.debug(`Setting property ${key} as ${parsedValue}`);
         copy[key] = parsedValue;
-      } catch (error) {
+      } catch {
         // If the value can't be parsed, just assign it directly
         core.debug(`Could not parse value, setting property ${key} as ${value}`);
         copy[key] = value;

@@ -1,7 +1,7 @@
 {
-  "name": "javascript-action",
-  "version": "1.0.0",
-  "description": "JavaScript Action Template",
+  "name": "json-replace",
+  "version": "2.0.0",
+  "description": "GitHub Action that performs value replacements on JSON objects",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -11,23 +11,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/beards-and-binary/json-replace.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "JSON"
   ],
-  "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/beards-and-binary/json-replace/issues"
   },
-  "homepage": "https://github.com/actions/javascript-action#readme",
+  "homepage": "https://github.com/beards-and-binary/json-replace#readme",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@actions/core": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.13.0",
     "jest": "^29.4.2"
