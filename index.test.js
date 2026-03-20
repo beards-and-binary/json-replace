@@ -1,7 +1,10 @@
-const cp = require('child_process');
-const path = require('path');
-const parseJson = require('./parse-json');
-const parseUpdates = require('./parse-updates');
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import parseJson from './parse-json.js';
+import parseUpdates from './parse-updates.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 test('parseJson throws on invalid JSON', () => {
   expect(() => parseJson('Invalid JSON')).toThrow('The passed JSON is invalid');
@@ -25,7 +28,7 @@ test('process runs', () => {
   process.env['INPUT_JSON'] = JSON.stringify(json);
   process.env['INPUT_UPDATES'] = JSON.stringify(updates);
 
-  const ip = path.join(__dirname, 'index.js');
-  const result = cp.execSync(`node ${ip}`, { env: process.env }).toString();
+  const ip = join(__dirname, 'index.js');
+  const result = execSync(`node ${ip}`, { env: process.env }).toString();
   console.log(result);
 });

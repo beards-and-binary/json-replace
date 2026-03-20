@@ -1,20 +1,14 @@
-const js = require('@eslint/js');
+import js from '@eslint/js';
 
-module.exports = [
+export default [
   js.configs.recommended,
   {
     languageOptions: {
-      ecmaVersion: 2019,
-      sourceType: 'commonjs',
+      ecmaVersion: 2022,
+      sourceType: 'module',
       globals: {
-        Atomics: 'readonly',
-        SharedArrayBuffer: 'readonly',
         console: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
         process: 'readonly',
-        __dirname: 'readonly',
-        exports: 'readonly',
       },
     },
   },

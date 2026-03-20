@@ -2,11 +2,12 @@
   "name": "json-replace",
   "version": "2.0.0",
   "description": "GitHub Action that performs value replacements on JSON objects",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
-    "test": "jest",
+    "prepare": "rollup -c",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "all": "npm run lint && npm run prepare && npm run test"
   },
   "repository": {
@@ -24,15 +25,17 @@
   },
   "homepage": "https://github.com/beards-and-binary/json-replace#readme",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1"
+    "@actions/core": "^3.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@vercel/ncc": "^0.38.4",
+    "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.3",
     "eslint": "^10.0.3",
-    "jest": "^30.3.0"
+    "jest": "^30.3.0",
+    "rollup": "^4.59.0"
   }
 }

@@ -1,6 +1,6 @@
-const core = require('@actions/core');
-const parseJson = require('./parse-json');
-const parseUpdates = require('./parse-updates');
+import * as core from '@actions/core';
+import parseJson from './parse-json.js';
+import parseUpdates from './parse-updates.js';
 
 async function run() {
   try {
