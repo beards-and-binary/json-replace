@@ -1,6 +1,6 @@
 {
   "name": "json-replace",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "GitHub Action that performs value replacements on JSON objects",
   "type": "module",
   "main": "index.js",
