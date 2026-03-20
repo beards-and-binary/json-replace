@@ -1,10 +1,10 @@
-const parseJson = require('./parse-json');
+import parseJson from './parse-json.js';
 
 /**
  * Parses the passed JSON Values List
  * @param {string} json
  */
-function parseUpdates(json) {
+export default function parseUpdates(json) {
   /** @type {[string, any][]} */
   const values = parseJson(json);
   const invalidKeys = values.filter((v) => !(typeof v[0] == 'string'));
@@ -13,5 +13,3 @@ function parseUpdates(json) {
   }
   return values;
 }
-
-module.exports = parseUpdates;

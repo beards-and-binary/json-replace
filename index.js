@@ -1,6 +1,6 @@
-const core = require('@actions/core');
-const parseJson = require('./parse-json');
-const parseUpdates = require('./parse-updates');
+import * as core from '@actions/core';
+import parseJson from './parse-json.js';
+import parseUpdates from './parse-updates.js';
 
 async function run() {
   try {
@@ -19,7 +19,7 @@ async function run() {
         const parsedValue = JSON.parse(value);
         core.debug(`Setting property ${key} as ${parsedValue}`);
         copy[key] = parsedValue;
-      } catch (error) {
+      } catch {
         // If the value can't be parsed, just assign it directly
         core.debug(`Could not parse value, setting property ${key} as ${value}`);
         copy[key] = value;

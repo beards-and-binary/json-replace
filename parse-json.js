@@ -3,12 +3,10 @@
  * @param {string} json
  * @returns {Object}
  */
-function parseJson(json) {
+export default function parseJson(json) {
   try {
     return JSON.parse(json);
-  } catch (error) {
+  } catch {
     throw new Error('The passed JSON is invalid');
   }
 }
-
-module.exports = parseJson;
