@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import parseJson from './parse-json.js';
@@ -83,7 +83,7 @@ function runAction(json, updates) {
     INPUT_JSON: JSON.stringify(json),
     INPUT_UPDATES: JSON.stringify(updates),
   };
-  return execSync(`node ${ip}`, { env }).toString();
+  return execFileSync('node', [ip], { env }).toString();
 }
 
 describe('action integration', () => {
