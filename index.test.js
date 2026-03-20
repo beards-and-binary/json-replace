@@ -1,6 +1,8 @@
 import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
 import parseJson from './parse-json.js';
 import parseUpdates from './parse-updates.js';
 
@@ -76,60 +78,90 @@ describe('parseUpdates', () => {
 
 // -- integration (end-to-end via node) ---------------------------------
 
+let tmpDir;
+let outputFile;
+
+beforeEach(() => {
+  tmpDir = mkdtempSync(join(tmpdir(), 'json-replace-test-'));
+  outputFile = join(tmpDir, 'output');
+  writeFileSync(outputFile, '');
+});
+
+afterEach(() => {
+  rmSync(tmpDir, { recursive: true, force: true });
+});
+
 function runAction(json, updates) {
   const ip = join(__dirname, 'index.js');
   const env = {
     ...process.env,
     INPUT_JSON: JSON.stringify(json),
     INPUT_UPDATES: JSON.stringify(updates),
+    GITHUB_OUTPUT: outputFile,
   };
-  return execFileSync('node', [ip], { env }).toString();
+  const stdout = execFileSync('node', [ip], { env }).toString();
+  const output = readFileSync(outputFile, 'utf8');
+  return { stdout, output };
+}
+
+function getOutputJson(output) {
+  // GITHUB_OUTPUT format: name<<delimiter\nvalue\ndelimiter\n
+  const match = output.match(/json<<(.*)\n([\s\S]*?)\n\1/);
+  return match ? match[2] : null;
 }
 
 describe('action integration', () => {
   test('adds a string property', () => {
-    const output = runAction({ id: 1 }, [['name', 'John Doe']]);
-    expect(output).toContain('::set-output name=json::');
-    expect(output).toContain('"name":"John Doe"');
+    const { stdout, output } = runAction({ id: 1 }, [['name', 'John Doe']]);
+    expect(stdout).toContain('Performing 1 update(s)');
+    const json = getOutputJson(output);
+    expect(JSON.parse(json)).toEqual({ id: 1, name: 'John Doe' });
   });
 
   test('overwrites an existing property', () => {
-    const output = runAction({ id: 1, name: 'old' }, [['name', 'new']]);
-    const outputLine = output.split('\n').find(l => l.startsWith('::set-output'));
-    expect(outputLine).toContain('"name":"new"');
+    const { output } = runAction({ id: 1, name: 'old' }, [['name', 'new']]);
+    const json = getOutputJson(output);
+    expect(JSON.parse(json)).toEqual({ id: 1, name: 'new' });
   });
 
   test('applies multiple updates', () => {
-    const output = runAction({ id: 1 }, [['a', 'x'], ['b', 'y']]);
-    expect(output).toContain('Performing 2 update(s)');
-    expect(output).toContain('"a":"x"');
-    expect(output).toContain('"b":"y"');
+    const { stdout, output } = runAction({ id: 1 }, [['a', 'x'], ['b', 'y']]);
+    expect(stdout).toContain('Performing 2 update(s)');
+    const json = getOutputJson(output);
+    const result = JSON.parse(json);
+    expect(result.a).toBe('x');
+    expect(result.b).toBe('y');
   });
 
   test('parses JSON-encoded values (number)', () => {
-    const output = runAction({}, [['count', '42']]);
-    expect(output).toContain('"count":42');
+    const { output } = runAction({}, [['count', '42']]);
+    const result = JSON.parse(getOutputJson(output));
+    expect(result.count).toBe(42);
   });
 
   test('parses JSON-encoded values (boolean)', () => {
-    const output = runAction({}, [['active', 'true']]);
-    expect(output).toContain('"active":true');
+    const { output } = runAction({}, [['active', 'true']]);
+    const result = JSON.parse(getOutputJson(output));
+    expect(result.active).toBe(true);
   });
 
   test('parses JSON-encoded values (nested object)', () => {
     const nested = JSON.stringify({ x: 1 });
-    const output = runAction({}, [['data', nested]]);
-    expect(output).toContain('"data":{"x":1}');
+    const { output } = runAction({}, [['data', nested]]);
+    const result = JSON.parse(getOutputJson(output));
+    expect(result.data).toEqual({ x: 1 });
   });
 
   test('falls back to string for unparseable values', () => {
-    const output = runAction({}, [['greeting', 'hello world']]);
-    expect(output).toContain('"greeting":"hello world"');
+    const { output } = runAction({}, [['greeting', 'hello world']]);
+    const result = JSON.parse(getOutputJson(output));
+    expect(result.greeting).toBe('hello world');
   });
 
   test('handles empty updates array', () => {
-    const output = runAction({ id: 1 }, []);
-    expect(output).toContain('Performing 0 update(s)');
-    expect(output).toContain('"id":1');
+    const { stdout, output } = runAction({ id: 1 }, []);
+    expect(stdout).toContain('Performing 0 update(s)');
+    const result = JSON.parse(getOutputJson(output));
+    expect(result).toEqual({ id: 1 });
   });
 });
